@@ -61,6 +61,24 @@
         .game-intro, .game-area, .game-end {
             padding: 20px;
         }
+
+        .game-intro {
+            min-height: calc(100vh - 88px);
+            display: flex;
+            align-items: stretch;
+            background: linear-gradient(90deg, rgba(255,253,248,.96) 0%, rgba(255,253,248,.88) 53%, rgba(255,253,248,.18) 100%), url('assets/illustrations/opening-hero.png') right center / cover;
+        }
+
+        .intro-panel { width: min(610px, 62%); display: flex; flex-direction: column; justify-content: center; }
+        .intro-kicker { color: var(--secondary); font-weight: 800; letter-spacing: .12em; margin-bottom: 8px; }
+        .intro-title { color: var(--primary); font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.12; margin: 0 0 10px; }
+        .intro-lead { font-size: 1.15rem; margin-bottom: 22px; }
+        .mission-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+        .mission-card { background: rgba(255,255,255,.92); border: 1px solid #ead8ca; border-radius: 12px; padding: 12px; box-shadow: 0 3px 10px rgba(38,50,56,.1); }
+        .mission-card strong { display: block; color: var(--secondary); margin-bottom: 4px; }
+        .mission-card span { font-size: .83rem; color: #56615d; }
+        .intro-note { color: #56615d; font-size: .88rem; margin-top: 10px; }
+        .start-game-btn { max-width: 360px; font-size: 1.18rem; padding: 14px 24px; margin: 6px 0 0; }
         
         .stats {
             display: flex;
@@ -494,25 +512,21 @@
         </header>
         
         <div class="game-intro" id="game-intro">
-            <h2>遊戲簡介</h2>
-            <p>你是一位在街頭生存多年的無家者。儘管每個人一天的時間都相同，但過去經歷與生理狀況都影響著你一開始的財力、體力、人脈、心情。</p>
-            <p>接下來你會經歷無家者每天日常的抉擇，經歷兩天的時間，看是否能越來越接近角色的生活目標，或因生存困難而離目標越來越遠？</p>
-            
-            <h3>遊戲目標</h3>
-            <ul>
-                <li>遊戲結束時人脈＋財力總和超過 5</li>
-                <li>不能獲得「好吃懶做」、「治安隱憂」這兩個標籤</li>
-            </ul>
-            
-            <h3>初始條件</h3>
-            <div class="stats">
-                <div class="stat">人脈：1</div>
-                <div class="stat">財力：0</div>
-                <div class="stat">體力：3</div>
-                <div class="stat">心情：0</div>
+            <div class="intro-panel">
+                <div class="intro-kicker">兩天生活挑戰</div>
+                <h2 class="intro-title">街頭求生<br>無家者生存模擬器</h2>
+                <p class="intro-lead">看見每個選擇背後，資源、健康與社會支持帶來的影響。</p>
+                <div class="mission-cards">
+                    <div class="mission-card"><strong>01｜兩天挑戰</strong><span>完成兩天的生活選擇。</span></div>
+                    <div class="mission-card"><strong>02｜累積支持</strong><span>累積人脈與財力。</span></div>
+                    <div class="mission-card"><strong>03｜看見影響</strong><span>避免負面標籤。</span></div>
+                </div>
+                <div class="stats">
+                    <div class="stat">人脈：1</div><div class="stat">財力：0</div><div class="stat">體力：3</div><div class="stat">心情：0</div>
+                </div>
+                <button class="next-btn start-game-btn" id="start-btn">開始我的兩天挑戰 →</button>
+                <p class="intro-note">約 8–12 分鐘｜適合小組討論｜這不是考驗誰比較會選，而是理解資源不足時的困難。</p>
             </div>
-            
-            <button class="next-btn" id="start-btn">開始遊戲</button>
         </div>
         
         <div class="game-area" id="game-area" style="display:none;">
