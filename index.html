@@ -25,13 +25,15 @@
             background-color: var(--light);
             color: var(--dark);
             line-height: 1.6;
-            padding: 20px;
+            padding: 12px;
             max-width: 100%;
             overflow-x: hidden;
         }
         
         .container {
-            max-width: 800px;
+            width: min(1180px, calc(100vw - 24px));
+            max-width: 1180px;
+            min-height: calc(100vh - 24px);
             margin: 0 auto;
             background: white;
             border-radius: 15px;
