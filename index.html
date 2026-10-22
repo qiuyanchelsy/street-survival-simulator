@@ -760,6 +760,38 @@
         // 當前決策階段
         let currentStage = "food";
         const stagesOrder = ["food", "work", "entertainment", "shower", "rest"];
+        const stageCards = {
+            food: {
+                image: "assets/illustrations/meal-station.png",
+                alt: "社區供餐站志工遞出餐盒的情境插圖",
+                label: "情境圖卡｜今天的第一個選擇",
+                text: "食物不只是填飽肚子，也和距離、時間、金錢、體力與能否得到協助有關。"
+            },
+            work: {
+                image: "assets/illustrations/work-recycling.png",
+                alt: "在回收站整理資源物的情境插圖",
+                label: "情境圖卡｜工作與收入",
+                text: "工作機會會受到體力、技能、身體狀況與人際支持影響。"
+            },
+            entertainment: {
+                image: "assets/illustrations/connection-park.png",
+                alt: "在公園和社區夥伴互動的情境插圖",
+                label: "情境圖卡｜人際連結",
+                text: "休閒活動也可能帶來陪伴、支持，或增加生活中的風險與支出。"
+            },
+            shower: {
+                image: "assets/illustrations/service-center.png",
+                alt: "走進社區服務據點的情境插圖",
+                label: "情境圖卡｜清潔與照顧",
+                text: "要維持清潔與健康，往往需要可近、安心且負擔得起的服務。"
+            },
+            rest: {
+                image: "assets/illustrations/shelter-rest.png",
+                alt: "在安全收容空間休息的情境插圖",
+                label: "情境圖卡｜安全休息",
+                text: "有地方安心睡一晚，才能恢復體力，也更有機會面對隔天的選擇。"
+            }
+        };
 
         // DOM 元素
         const gameIntro = document.getElementById("game-intro");
@@ -810,17 +842,18 @@
             title.textContent = decision.title;
             decisionArea.appendChild(title);
 
-            if (currentStage === "food") {
+            const cardData = stageCards[currentStage];
+            if (cardData) {
                 const stageCard = document.createElement("div");
                 stageCard.className = "stage-card";
 
                 const stageCopy = document.createElement("div");
                 stageCopy.className = "stage-card-copy";
-                stageCopy.innerHTML = '<div class="stage-card-label">情境圖卡｜今天的第一個選擇</div><p>食物不只是填飽肚子，也和距離、時間、金錢、體力與能否得到協助有關。</p>';
+                stageCopy.innerHTML = `<div class="stage-card-label">${cardData.label}</div><p>${cardData.text}</p>`;
 
                 const stageImage = document.createElement("img");
-                stageImage.src = "assets/illustrations/meal-station.png";
-                stageImage.alt = "社區供餐站志工遞出餐盒的情境插圖";
+                stageImage.src = cardData.image;
+                stageImage.alt = cardData.alt;
 
                 stageCard.append(stageCopy, stageImage);
                 decisionArea.appendChild(stageCard);
