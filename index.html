@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>街頭求生：無家者生存模擬器</title>
+    <style>
+        :root {
+            --primary: #3e5641;
+            --secondary: #a24936;
+            --accent: #d7b29d;
+            --light: #f5f1ed;
+            --dark: #263238;
+            --shadow: rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .game-intro, .game-area, .game-end {
+            padding: 20px;
+        }
+        
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .stat {
+            background: var(--accent);
+            color: var(--dark);
+            padding: 10px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: center;
+            max-width: 120px;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .tag {
+            background: var(--secondary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .decision-area {
+            margin-top: 20px;
+        }
+        
+        h3 {
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            background: white;
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .option:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+        
+        .option.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #f5f5f5;
+        }
+        
+        .option.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .option-description {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            color: #555;
+        }
+        
+        .requirement {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .day-indicator {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .result {
+            background: var(--accent);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .result-effect {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .effect {
+            background: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .positive {
+            color: green;
+        }
+        
+        .negative {
+            color: red;
+        }
+        
+        .next-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .next-btn:hover {
+            background: #8e3c2e;
+        }
+        
+        .game-end {
+            text-align: center;
+        }
+        
+        .result-summary {
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--accent);
+            border-radius: 8px;
+        }
+        
+        .goal-status {
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .goal-achieved {
+            color: green;
+        }
+        
+        .goal-failed {
+            color: var(--secondary);
+        }
+        
+        .reflection {
+            margin-top: 30px;
+            text-align: left;
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .reflection-question {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .restart-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .restart-btn:hover {
+            background: #324535;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 8px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .stat {
+                min-width: calc(50% - 10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>街頭求生：無家者生存模擬器</h1>
+            <div class="subtitle">體驗無家者的日常選擇與困境</div>
+        </header>
+        
+        <div class="game-intro" id="game-intro">
+            <h2>遊戲簡介</h2>
+            <p>你是一位在街頭生存多年的無家者。儘管每個人一天的時間都相同，但過去經歷與生理狀況都影響著你一開始的財力、體力、人脈、心情。</p>
+            <p>接下來你會經歷無家者每天日常的抉擇，經歷兩天的時間，看是否能越來越接近角色的生活目標，或因生存困難而離目標越來越遠？</p>
+            
+            <h3>遊戲目標</h3>
+            <ul>
+                <li>遊戲結束時人脈＋財力總和超過 5</li>
+                <li>不能獲得「好吃懶做」、「治安隱憂」這兩個標籤</li>
+            </ul>
+            
+            <h3>初始條件</h3>
+            <div class="stats">
+                <div class="stat">人脈：1</div>
+                <div class="stat">財力：0</div>
+                <div class="stat">體力：3</div>
+                <div class="stat">心情：0</div>
+            </div>
+            
+            <button class="next-btn" id="start-btn">開始遊戲</button>
+        </div>
+        
+        <div class="game-area" id="game-area" style="display:none;">
+            <div class="day-indicator" id="day-indicator">第1天</div>
+            
+            <div class="stats" id="player-stats">
+                <div class="stat">人脈：<span id="connections">1</span></div>
+                <div class="stat">財力：<span id="money">0</span></div>
+                <div class="stat">體力：<span id="energy">3</span></div>
+                <div class="stat">心情：<span id="mood">0</span></div>
+            </div>
+            
+            <div class="tags" id="player-tags"></div>
+            
+            <div class="decision-area" id="decision-area">
+                <!-- 動態生成決策內容 -->
+            </div>
+            
+            <div class="result" id="result" style="display:none;">
+                <h3>結果</h3>
+                <p id="result-text"></p>
+                <div class="result-effect" id="result-effects"></div>
+                <button class="next-btn" id="next-btn">繼續</button>
+            </div>
+        </div>
+        
+        <div class="game-end" id="game-end" style="display:none;">
+            <h2>遊戲結束</h2>
+            <div class="result-summary" id="result-summary">
+                <!-- 動態生成結果摘要 -->
+            </div>
+            
+            <div class="reflection">
+                <h3>反思</h3>
+                <div class="reflection-question">1. 做選擇的時候有哪些考量與取捨？達到遊戲目標是困難的嗎？為什麼？</div>
+                <div class="reflection-question">2. 你與無家者生活的相同點和不同點有哪些？</div>
+                <div class="reflection-question">3. 經過這次體驗，你對無家者的處境有什麼新的理解？</div>
+            </div>
+            
+            <button class="restart-btn" id="restart-btn">重新開始</button>
+        </div>
+    </div>
+
+    <script>
+        // 遊戲資料
+        const gameData = {
+            decisions: {
+                food: {
+                    title: "食物の抉擇",
+                    options: [
+                        {
+                            id: "hungry",
+                            name: "餓著肚子",
+                            description: "今天不吃飯，好像還能撐一天，餓肚子好了",
+                            effects: [
+                                { type: "energy", value: -1, text: "體力 -1" }
+                            ]
+                        },
+                        {
+                            id: "wait",
+                            name: "等待發餐",
+                            description: "待在休息處等待慈善團體來發便當",
+                            effects: [
+                                { type: "tag", value: "好吃懶做", text: "獲得標籤：好吃懶做" },
+                                { type: "skipWork", value: true, text: "今天無法工作" }
+                            ]
+                        },
+                        {
+                            id: "church",
+                            name: "領取聖餐",
+                            description: "中午或傍晚走到路途遙遠的教會，聆聽佈道後領餐",
+                            effects: [
+                                { type: "mood", value: -1, text: "心情 -1" },
+                                { type: "connections", value: 1, text: "人脈 +1" }
+                            ]
+                        },
+                        {
+                            id: "free_meal",
+                            name: "找待用餐",
+                            description: "尋找提供待用餐的店家，看看還有沒有剩餘的待用餐便當",
+                            effects: [
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ type: "energy", value: -1, text: "體力 -1（找不到待用餐）" }] },
+                                    { probability: 0.67, effects: [{ type: "energy", value: 1, text: "體力 +1（找到待用餐）" }] }
+                                ]}
+                            ]
+                        },
+                        {
+                            id: "trash",
+                            name: "翻垃圾桶",
+                            description: "車站垃圾桶會有行人為了趕路只吃幾口的便當，翻翻看吧",
+                            effects: [
+                                { type: "tag", value: "有異味", text: "獲得標籤：有異味" },
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ type: "skipWork", value: true, text: "吃到壞掉的東西，今天無法工作" }] },
+                                    { probability: 0.67, effects: [] }
+                                ]}
+                            ]
+                        },
+                        {
+                            id: "buy",
+                            name: "自行買餐",
+                            description: "雖然貴了一點，今天還是自己買好了",
+                            effects: [
+                                { type: "money", value: -2, text: "財力 -2" },
+                                { type: "mood", value: 2, text: "心情 +2" }
+                            ]
+                        }
+                    ]
+                },
+                work: {
+                    title: "工作の抉擇",
+                    options: [
+                        {
+                            id: "no_work",
+                            name: "無法工作",
+                            description: "因為前面選擇等待發餐或吃到壞東西，今天沒辦法去工作",
+                            requireSkip: true,
+                            effects: []
+                        },
+                        {
+                            id: "recycling",
+                            name: "拾荒回收",
+                            description: "有些認識的店家會留資源回收的物品給我",
+                            requireConnections: 2,
+                            effects: [
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ type: "money", value: 3, text: "財力 +3（遇到善心店家）" }] },
+                                    { probability: 0.67, effects: [{ text: "回收價格慘淡，無法獲得財力" }] }
+                                ]},
+                                { type: "tag", value: "有異味", text: "獲得標籤：有異味" },
+                                { type: "energy", value: -1, text: "體力 -1" }
+                            ]
+                        },
+                        {
+                            id: "construction",
+                            name: "工地粗工",
+                            description: "因為自己年輕有體力，可以去工地做粗工",
+                            requireEnergy: 2,
+                            effects: [
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ text: "今天下雨停工，無法獲得財力" }] },
+                                    { probability: 0.67, effects: [{ type: "money", value: 3, text: "財力 +3" }] }
+                                ]},
+                                { type: "energy", value: -1, text: "體力 -1" }
+                            ]
+                        },
+                        {
+                            id: "temple",
+                            name: "廟會陣頭",
+                            description: "剛好有廟會要出陣頭，但路途遙遠",
+                            requireEnergy: 2,
+                            effects: [
+                                { type: "money", value: 2, text: "財力 +2" },
+                                { type: "connections", value: 1, text: "人脈 +1" },
+                                { type: "energy", value: -1, text: "體力 -1" }
+                            ]
+                        },
+                        {
+                            id: "sign",
+                            name: "舉牌",
+                            description: "以自己的狀況來說，好像沒有什麼選擇，只能去舉牌了",
+                            effects: [
+                                { type: "money", value: 2, text: "財力 +2" },
+                                { type: "energy", value: -1, text: "體力 -1" }
+                            ]
+                        },
+                        {
+                            id: "street_sell",
+                            name: "街賣",
+                            description: "因為自己有身心障礙的狀況，你心想或許可以嘗試看看街賣",
+                            effects: [
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ type: "money", value: 3, text: "財力 +3（遇到許多善心人士）" }] },
+                                    { probability: 0.67, effects: [{ text: "遇到下雨街上都沒有人，無法獲得財力" }] }
+                                ]},
+                                { type: "tag", value: "販賣愛心", text: "獲得標籤：販賣愛心" },
+                                { type: "energy", value: -1, text: "體力 -1" }
+                            ]
+                        },
+                        {
+                            id: "cleaning",
+                            name: "清潔打掃",
+                            description: "你看到有個清潔的工作，但需要較好的體力",
+                            requireEnergy: 2,
+                            effects: [
+                                { type: "money", value: 2, text: "財力 +2" },
+                                { type: "energy", value: -1, text: "體力 -1" }
+                            ]
+                        }
+                    ]
+                },
+                entertainment: {
+                    title: "娛樂の抉擇",
+                    options: [
+                        {
+                            id: "doll",
+                            name: "去夾娃娃",
+                            description: "夾娃娃能給自己成就感，你決定去附近的機台試試身手",
+                            requireMoney: 1,
+                            effects: [
+                                { type: "money", value: -1, text: "財力 -1" },
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ type: "mood", value: 3, text: "心情 +3（夾到許多娃娃）" }] },
+                                    { probability: 0.67, effects: [{ type: "mood", value: -2, text: "心情 -2（一整晚都沒夾到）" }] }
+                                ]},
+                                { type: "tag", value: "無所事事", text: "獲得標籤：無所事事" }
+                            ]
+                        },
+                        {
+                            id: "karaoke",
+                            name: "卡拉OK唱歌",
+                            description: "街頭的其他人邀你去卡拉OK唱歌",
+                            requireMoney: 3,
+                            effects: [
+                                { type: "money", value: -3, text: "財力 -3" },
+                                { type: "connections", value: 2, text: "人脈 +2" },
+                                { type: "tag", value: "浪費錢", text: "獲得標籤：浪費錢" }
+                            ]
+                        },
+                        {
+                            id: "chat",
+                            name: "找人聊天",
+                            description: "你覺得一個人有點寂寞，想去服務據點找社工聊天",
+                            effects: [
+                                { type: "mood", value: 2, text: "心情 +2" },
+                                { type: "connections", value: -1, text: "人脈 -1（打擾到社工工作）" }
+                            ]
+                        },
+                        {
+                            id: "lottery",
+                            name: "買樂透",
+                            description: "想找人合資買樂透，財力一定要「All In」賭一把",
+                            requireMoney: 1,
+                            allIn: true,
+                            effects: [
+                                { type: "tag", value: "浪費錢", text: "獲得標籤：浪費錢" },
+                                { type: "allInLottery", text: "All in 樂透" }
+                            ]
+                        },
+                        {
+                            id: "chess",
+                            name: "找人下棋",
+                            description: "你想找其他人下棋，決定到公園看看有沒有棋局",
+                            effects: [
+                                { type: "connections", value: 1, text: "人脈 +1" },
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ type: "mood", value: 2, text: "心情 +2（贏了）" }] },
+                                    { probability: 0.67, effects: [{ type: "mood", value: -1, text: "心情 -1（一整晚都輸）" }] }
+                                ]}
+                            ]
+                        },
+                        {
+                            id: "drink",
+                            name: "喝酒小酌",
+                            description: "你決定好好犒賞自己的辛勞，去買了點啤酒",
+                            requireMoney: 2,
+                            effects: [
+                                { type: "money", value: -2, text: "財力 -2" },
+                                { type: "mood", value: 2, text: "心情 +2" },
+                                { type: "tag", value: "治安隱憂", text: "獲得標籤：治安隱憂" }
+                            ]
+                        }
+                    ]
+                },
+                shower: {
+                    title: "洗澡の抉擇",
+                    options: [
+                        {
+                            id: "no_shower",
+                            name: "不想洗澡",
+                            description: "今天太疲憊了，要找洗澡的地方也不容易，今天先不洗澡",
+                            effects: [
+                                { type: "tag", value: "有異味", text: "獲得標籤：有異味" }
+                            ]
+                        },
+                        {
+                            id: "sports",
+                            name: "運動中心",
+                            description: "付點錢到運動中心洗澡",
+                            requireMoney: 1,
+                            disableTag: "有異味",
+                            effects: [
+                                { type: "money", value: -1, text: "財力 -1" },
+                                { type: "mood", value: 1, text: "心情 +1" },
+                                { type: "removeTag", value: "有異味", text: "移除標籤：有異味" }
+                            ]
+                        },
+                        {
+                            id: "toilet",
+                            name: "廁所擦澡",
+                            description: "你選擇尋找休息處附近的廁所擦澡",
+                            effects: [
+                                { type: "tag", value: "行為怪異", text: "獲得標籤：行為怪異" },
+                                { type: "removeTag", value: "有異味", text: "移除標籤：有異味" }
+                            ]
+                        },
+                        {
+                            id: "service",
+                            name: "服務據點",
+                            description: "你選擇到社會局或 NGO 服務據點使用洗澡設備",
+                            effects: [
+                                { type: "energy", value: -1, text: "體力 -1（走遠路）" },
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ type: "removeTag", value: "有異味", text: "移除標籤：有異味（今天人少）" }] },
+                                    { probability: 0.67, effects: [{ type: "mood", value: -2, text: "心情 -2（大排長龍）" }] }
+                                ]}
+                            ]
+                        },
+                        {
+                            id: "hotel",
+                            name: "旅館休息",
+                            description: "你今天特別疲憊，決定好好犒賞自己，選擇到旅館休息",
+                            requireMoney: 3,
+                            effects: [
+                                { type: "money", value: -3, text: "財力 -3" },
+                                { type: "energy", value: 3, text: "體力 +3" },
+                                { type: "removeTag", value: "有異味", text: "移除標籤：有異味" },
+                                { type: "skipRest", value: true, text: "今晚已有住宿，不需選擇休息方式" }
+                            ]
+                        },
+                        {
+                            id: "cyber",
+                            name: "網咖休息",
+                            description: "你不想人擠人，也不想讓路人指指點點，決定去網咖",
+                            requireMoney: 2,
+                            effects: [
+                                { type: "money", value: -2, text: "財力 -2" },
+                                { type: "energy", value: 2, text: "體力 +2" },
+                                { type: "removeTag", value: "有異味", text: "移除標籤：有異味" },
+                                { type: "skipRest", value: true, text: "今晚已有住宿，不需選擇休息方式" }
+                            ]
+                        }
+                    ]
+                },
+                rest: {
+                    title: "休息の抉擇",
+                    options: [
+                        {
+                            id: "good_sleep",
+                            name: "睡個好覺",
+                            description: "前面選擇網咖或旅宿休息，不需要再選擇",
+                            requireSkip: true,
+                            effects: []
+                        },
+                        {
+                            id: "shelter",
+                            name: "去收容所",
+                            description: "你決定到路途遙遠的收容所休息",
+                            effects: [
+                                { type: "energy", value: 1, text: "體力 +1" },
+                                { type: "connections", value: -1, text: "人脈 -1（與室友吵架）" }
+                            ]
+                        },
+                        {
+                            id: "mcdonalds",
+                            name: "去麥當勞",
+                            description: "你決定到休息處附近24小時營業的麥當勞休息",
+                            effects: [
+                                { type: "tag", value: "行為怪異", text: "獲得標籤：行為怪異" }
+                            ]
+                        },
+                        {
+                            id: "street",
+                            name: "街頭休息",
+                            description: "為了省錢，你決定今晚在路邊休息",
+                            effects: [
+                                { type: "tag", value: "治安隱憂", text: "獲得標籤：治安隱憂" },
+                                { type: "energy", value: -1, text: "體力 -1（難以入睡）" },
+                                { type: "connections", value: 1, text: "人脈 +1（認識了新朋友）" },
+                                { type: "random", results: [
+                                    { probability: 0.33, effects: [{ text: "無風無雨，好好休息了一個晚上" }] },
+                                    { probability: 0.67, effects: [{ type: "money", value: -1, text: "財力 -1（財務遭竊）" }] }
+                                ]}
+                            ]
+                        }
+                    ]
+                }
+            }
+        };
+
+        // 玩家資料
+        let player = {
+            connections: 1,
+            money: 0,
+            energy: 3,
+            mood: 0,
+            tags: [],
+            skipWork: false,
+            skipRest: false,
+            day: 1
+        };
+
+        // 當前決策階段
+        let currentStage = "food";
+        const stagesOrder = ["food", "work", "entertainment", "shower", "rest"];
+
+        // DOM 元素
+        const gameIntro = document.getElementById("game-intro");
+        const gameArea = document.getElementById("game-area");
+        const gameEnd = document.getElementById("game-end");
+        const decisionArea = document.getElementById("decision-area");
+        const resultArea = document.getElementById("result");
+        const resultText = document.getElementById("result-text");
+        const resultEffects = document.getElementById("result-effects");
+        const dayIndicator = document.getElementById("day-indicator");
+        const playerTags = document.getElementById("player-tags");
+        
+        // 更新玩家資料顯示
+        function updatePlayerStats() {
+            document.getElementById("connections").textContent = player.connections;
+            document.getElementById("money").textContent = player.money;
+            document.getElementById("energy").textContent = player.energy;
+            document.getElementById("mood").textContent = player.mood;
+            
+            // 更新標籤
+            playerTags.innerHTML = '';
+            player.tags.forEach(tag => {
+                const tagElement = document.createElement("div");
+                tagElement.className = "tag";
+                tagElement.textContent = tag;
+                playerTags.appendChild(tagElement);
+            });
+        }
+        
+        // 顯示當前決策選項
+        function showDecisionOptions() {
+            decisionArea.innerHTML = '';
+            
+            // 如果需要跳過工作
+            if (currentStage === "work" && player.skipWork) {
+                makeDecision("no_work");
+                return;
+            }
+            
+            // 如果需要跳過休息
+            if (currentStage === "rest" && player.skipRest) {
+                makeDecision("good_sleep");
+                return;
+            }
+            
+            const decision = gameData.decisions[currentStage];
+            const title = document.createElement("h3");
+            title.textContent = decision.title;
+            decisionArea.appendChild(title);
+            
+            const options = document.createElement("div");
+            options.className = "options";
+            
+            decision.options.forEach(option => {
+                // 檢查條件
+                let disabled = false;
+                let requirementText = "";
+                
+                if (option.requireSkip) {
+                    disabled = true;
+                }
+                
+                if (option.requireConnections && player.connections < option.requireConnections) {
+                    disabled = true;
+                    requirementText = `需要人脈 ≥ ${option.requireConnections}`;
+                }
+                
+                if (option.requireEnergy && player.energy < option.requireEnergy) {
+                    disabled = true;
+                    requirementText = `需要體力 ≥ ${option.requireEnergy}`;
+                }
+                
+                if (option.requireMoney && player.money < option.requireMoney) {
+                    disabled = true;
+                    requirementText = `需要財力 ≥ ${option.requireMoney}`;
+                }
+                
+                if (option.disableTag && player.tags.includes(option.disableTag)) {
+                    disabled = true;
+                    requirementText = `有「${option.disableTag}」標籤無法使用`;
+                }
+                
+                const optionElement = document.createElement("div");
+                optionElement.className = disabled ? "option disabled" : "option";
+                
+                const optionTitle = document.createElement("div");
+                optionTitle.textContent = option.name;
+                optionElement.appendChild(optionTitle);
+                
+                const optionDesc = document.createElement("div");
+                optionDesc.className = "option-description";
+                optionDesc.textContent = option.description;
+                optionElement.appendChild(optionDesc);
+                
+                if (requirementText) {
+                    const requirement = document.createElement("div");
+                    requirement.className = "requirement";
+                    requirement.textContent = requirementText;
+                    optionElement.appendChild(requirement);
+                }
+                
+                if (!disabled) {
+                    optionElement.addEventListener("click", () => {
+                        makeDecision(option.id);
+                    });
+                }
+                
+                options.appendChild(optionElement);
+            });
+            
+            decisionArea.appendChild(options);
+        }
+        
+        // 處理決策結果
+        function makeDecision(optionId) {
+            const decision = gameData.decisions[currentStage];
+            const selectedOption = decision.options.find(option => option.id === optionId);
+            
+            resultText.textContent = selectedOption.description;
+            resultEffects.innerHTML = '';
+            
+            // 處理效果
+            selectedOption.effects.forEach(effect => {
+                processEffect(effect);
+            });
+            
+            decisionArea.style.display = "none";
+            resultArea.style.display = "block";
+        }
+        
+        // 處理效果
+        function processEffect(effect) {
+            if (effect.type === "connections") {
+                player.connections += effect.value;
+                if (player.connections < 0) player.connections = 0;
+                
+                const effectElement = document.createElement("div");
+                effectElement.className = `effect ${effect.value > 0 ? 'positive' : 'negative'}`;
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+            else if (effect.type === "money") {
+                player.money += effect.value;
+                if (player.money < 0) player.money = 0;
+                
+                const effectElement = document.createElement("div");
+                effectElement.className = `effect ${effect.value > 0 ? 'positive' : 'negative'}`;
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+            else if (effect.type === "energy") {
+                player.energy += effect.value;
+                if (player.energy < 0) player.energy = 0;
+                
+                const effectElement = document.createElement("div");
+                effectElement.className = `effect ${effect.value > 0 ? 'positive' : 'negative'}`;
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+            else if (effect.type === "mood") {
+                player.mood += effect.value;
+                
+                const effectElement = document.createElement("div");
+                effectElement.className = `effect ${effect.value > 0 ? 'positive' : 'negative'}`;
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+            else if (effect.type === "tag") {
+                if (!player.tags.includes(effect.value)) {
+                    player.tags.push(effect.value);
+                }
+                
+                const effectElement = document.createElement("div");
+                effectElement.className = "effect negative";
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+            else if (effect.type === "removeTag") {
+                player.tags = player.tags.filter(tag => tag !== effect.value);
+                
+                const effectElement = document.createElement("div");
+                effectElement.className = "effect positive";
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+            else if (effect.type === "skipWork") {
+                player.skipWork = effect.value;
+                
+                const effectElement = document.createElement("div");
+                effectElement.className = "effect negative";
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+            else if (effect.type === "skipRest") {
+                player.skipRest = effect.value;
+                
+                const effectElement = document.createElement("div");
+                effectElement.className = "effect";
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+            else if (effect.type === "allInLottery") {
+                const betAmount = player.money;
+                player.money = 0;
+                
+                const random = Math.random();
+                if (random < 0.33) {
+                    player.money = betAmount * 2;
+                    
+                    const winElement = document.createElement("div");
+                    winElement.className = "effect positive";
+                    winElement.textContent = `賭中了！財力 +${betAmount * 2}`;
+                    resultEffects.appendChild(winElement);
+                } else {
+                    const loseElement = document.createElement("div");
+                    loseElement.className = "effect negative";
+                    loseElement.textContent = `賭輸了，喪失賭金 ${betAmount}`;
+                    resultEffects.appendChild(loseElement);
+                }
+            }
+            else if (effect.type === "random") {
+                let totalProbability = 0;
+                const random = Math.random();
+                
+                for (const result of effect.results) {
+                    totalProbability += result.probability;
+                    if (random < totalProbability) {
+                        result.effects.forEach(subEffect => {
+                            processEffect(subEffect);
+                        });
+                        break;
+                    }
+                }
+            }
+            else if (effect.text) {
+                const effectElement = document.createElement("div");
+                effectElement.className = "effect";
+                effectElement.textContent = effect.text;
+                resultEffects.appendChild(effectElement);
+            }
+        }
+        
+        // 進入下一階段
+        function nextStage() {
+            const currentIndex = stagesOrder.indexOf(currentStage);
+            
+            if (currentIndex < stagesOrder.length - 1) {
+                // 進入下一個決策階段
+                currentStage = stagesOrder[currentIndex + 1];
+                updatePlayerStats();
+                showDecisionOptions();
+                decisionArea.style.display = "block";
+                resultArea.style.display = "none";
+            } else if (player.day === 1) {
+                // 結束第一天，進入第二天
+                player.day = 2;
+                player.skipWork = false;
+                player.skipRest = false;
+                currentStage = "food";
+                dayIndicator.textContent = `第${player.day}天`;
+                updatePlayerStats();
+                showDecisionOptions();
+                decisionArea.style.display = "block";
+                resultArea.style.display = "none";
+            } else {
+                // 遊戲結束
+                endGame();
+            }
+        }
+        
+        // 結束遊戲
+        function endGame() {
+            gameArea.style.display = "none";
+            gameEnd.style.display = "block";
+            
+            const resultSummary = document.getElementById("result-summary");
+            resultSummary.innerHTML = '';
+            
+            const totalScore = player.connections + player.money;
+            const hasNoNegativeTags = !player.tags.includes("好吃懶做") && !player.tags.includes("治安隱憂");
+            const isWin = totalScore >= 5 && hasNoNegativeTags;
+            
+            const finalStats = document.createElement("div");
+            finalStats.className = "stats";
+            finalStats.innerHTML = `
+                <div class="stat">人脈：${player.connections}</div>
+                <div class="stat">財力：${player.money}</div>
+                <div class="stat">體力：${player.energy}</div>
+                <div class="stat">心情：${player.mood}</div>
+            `;
+            resultSummary.appendChild(finalStats);
+            
+            if (player.tags.length > 0) {
+                const finalTags = document.createElement("div");
+                finalTags.className = "tags";
+                player.tags.forEach(tag => {
+                    const tagElement = document.createElement("div");
+                    tagElement.className = "tag";
+                    tagElement.textContent = tag;
+                    finalTags.appendChild(tagElement);
+                });
+                resultSummary.appendChild(finalTags);
+            }
+            
+            const goalStatus = document.createElement("div");
+            goalStatus.className = `goal-status ${isWin ? 'goal-achieved' : 'goal-failed'}`;
+            goalStatus.textContent = isWin ? "恭喜！你達成了生活目標！" : "很遺憾，你未能達成生活目標。";
+            resultSummary.appendChild(goalStatus);
+            
+            const goalDetails = document.createElement("div");
+            goalDetails.innerHTML = `
+                <p>你的人脈＋財力總和：${totalScore} (目標：≥ 5)</p>
+                <p>是否避免獲得「好吃懶做」、「治安隱憂」標籤：${hasNoNegativeTags ? '是' : '否'}</p>
+            `;
+            resultSummary.appendChild(goalDetails);
+        }
+        
+        // 事件監聽器
+        document.getElementById("start-btn").addEventListener("click", () => {
+            gameIntro.style.display = "none";
+            gameArea.style.display = "block";
+            showDecisionOptions();
+        });
+        
+        document.getElementById("next-btn").addEventListener("click", nextStage);
+        
+        document.getElementById("restart-btn").addEventListener("click", () => {
+            // 重設玩家資料
+            player = {
+                connections: 1,
+                money: 0,
+                energy: 3,
+                mood: 0,
+                tags: [],
+                skipWork: false,
+                skipRest: false,
+                day: 1
+            };
+            
+            currentStage = "food";
+            dayIndicator.textContent = `第${player.day}天`;
+            
+            // 重新顯示遊戲區域
+            gameEnd.style.display = "none";
+            gameArea.style.display = "block";
+            updatePlayerStats();
+            showDecisionOptions();
+            decisionArea.style.display = "block";
+            resultArea.style.display = "none";
+        });
+    </script>
+</body>
+</html>
