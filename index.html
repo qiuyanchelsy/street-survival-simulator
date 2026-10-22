@@ -537,6 +537,7 @@
             </div>
             
             <button class="restart-btn" id="restart-btn">重新開始</button>
+            <button class="restart-btn" id="download-record-btn">下載我的體驗紀錄圖</button>
         </div>
     </div>
 
@@ -1260,6 +1261,7 @@
             goalStatus.className = `goal-status ${isWin ? 'goal-achieved' : 'goal-failed'}`;
             goalStatus.textContent = isWin ? "恭喜！你達成了生活目標！" : "很遺憾，你未能達成生活目標。";
             resultSummary.appendChild(goalStatus);
+            document.getElementById("download-record-btn").textContent = isWin ? "下載我的過關紀錄圖" : "下載我的體驗紀錄圖";
             
             const goalDetails = document.createElement("div");
             goalDetails.innerHTML = `
@@ -1301,6 +1303,55 @@
             showDecisionOptions();
             decisionArea.style.display = "block";
             resultArea.style.display = "none";
+        });
+
+        document.getElementById("download-record-btn").addEventListener("click", () => {
+            const totalScore = player.connections + player.money;
+            const hasNoNegativeTags = !player.tags.includes("好吃懶做") && !player.tags.includes("治安隱憂");
+            const isWin = totalScore >= 5 && hasNoNegativeTags;
+            const canvas = document.createElement("canvas");
+            canvas.width = 1600;
+            canvas.height = 900;
+            const ctx = canvas.getContext("2d");
+            const background = new Image();
+            background.src = "assets/illustrations/shelter-rest.png";
+            background.onload = () => {
+                ctx.fillStyle = "#f7f1e9";
+                ctx.fillRect(0, 0, 1600, 900);
+                ctx.globalAlpha = 0.22;
+                ctx.drawImage(background, 780, 0, 820, 900);
+                ctx.globalAlpha = 1;
+                ctx.fillStyle = "#3e5641";
+                ctx.fillRect(0, 0, 1600, 150);
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 52px 'Noto Sans TC', sans-serif";
+                ctx.fillText("街頭求生：無家者生存模擬器", 90, 88);
+                ctx.font = "32px 'Noto Sans TC', sans-serif";
+                ctx.fillText("我的學習體驗紀錄", 94, 125);
+                ctx.fillStyle = isWin ? "#3e5641" : "#a24936";
+                ctx.font = "bold 52px 'Noto Sans TC', sans-serif";
+                ctx.fillText(isWin ? "我達成了生活目標！" : "我正在理解生活中的選擇與資源", 90, 250);
+                ctx.fillStyle = "#263238";
+                ctx.font = "34px 'Noto Sans TC', sans-serif";
+                [
+                    `人脈　${player.connections}`,
+                    `財力　${player.money}`,
+                    `體力　${player.energy}`,
+                    `心情　${player.mood}`
+                ].forEach((text, index) => ctx.fillText(text, 100 + (index % 2) * 290, 350 + Math.floor(index / 2) * 90));
+                ctx.font = "28px 'Noto Sans TC', sans-serif";
+                ctx.fillText(`本局標籤：${player.tags.length ? player.tags.join("、") : "沒有負面標籤"}`, 90, 560);
+                ctx.fillStyle = "#a24936";
+                ctx.font = "30px 'Noto Sans TC', sans-serif";
+                ctx.fillText("每一個選擇背後，都可能受到資源、健康與社會支持影響。", 90, 700);
+                ctx.fillStyle = "#56615d";
+                ctx.font = "24px 'Noto Sans TC', sans-serif";
+                ctx.fillText(new Date().toLocaleDateString("zh-TW"), 90, 780);
+                const link = document.createElement("a");
+                link.download = `街頭求生_體驗紀錄_${new Date().toISOString().slice(0, 10)}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            };
         });
     </script>
 </body>
