@@ -1315,12 +1315,14 @@
             const ctx = canvas.getContext("2d");
             const background = new Image();
             background.src = "assets/illustrations/shelter-rest.png";
-            background.onload = () => {
+            const createDownload = () => {
                 ctx.fillStyle = "#f7f1e9";
                 ctx.fillRect(0, 0, 1600, 900);
-                ctx.globalAlpha = 0.22;
-                ctx.drawImage(background, 780, 0, 820, 900);
-                ctx.globalAlpha = 1;
+                if (background.complete && background.naturalWidth) {
+                    ctx.globalAlpha = 0.22;
+                    ctx.drawImage(background, 780, 0, 820, 900);
+                    ctx.globalAlpha = 1;
+                }
                 ctx.fillStyle = "#3e5641";
                 ctx.fillRect(0, 0, 1600, 150);
                 ctx.fillStyle = "#ffffff";
@@ -1350,8 +1352,11 @@
                 const link = document.createElement("a");
                 link.download = `街頭求生_體驗紀錄_${new Date().toISOString().slice(0, 10)}.png`;
                 link.href = canvas.toDataURL("image/png");
+                document.body.appendChild(link);
                 link.click();
+                link.remove();
             };
+            createDownload();
         });
     </script>
 </body>
