@@ -1223,6 +1223,9 @@
         function endGame() {
             gameArea.style.display = "none";
             gameEnd.style.display = "block";
+            resultArea.style.display = "none";
+            window.scrollTo(0, 0);
+            gameEnd.scrollIntoView({ block: "start" });
             
             const resultSummary = document.getElementById("result-summary");
             resultSummary.innerHTML = '';
