@@ -398,6 +398,22 @@
             background: #324535;
         }
 
+        .record-student-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 18px 0 4px;
+        }
+
+        .record-student-info input {
+            min-width: 150px;
+            padding: 9px 12px;
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
         .stage-card {
             display: grid;
             grid-template-columns: minmax(0, 1.3fr) minmax(170px, 0.7fr);
@@ -536,6 +552,10 @@
                 <div class="reflection-question">3. 經過這次體驗，你對無家者的處境有什麼新的理解？</div>
             </div>
             
+            <div class="record-student-info">
+                <input id="student-class-seat" type="text" maxlength="20" placeholder="班級座號（例：601-08）">
+                <input id="student-nickname" type="text" maxlength="20" placeholder="暱稱（選填）">
+            </div>
             <button class="restart-btn" id="restart-btn">重新開始</button>
             <button class="restart-btn" id="download-record-btn">下載我的體驗紀錄圖</button>
         </div>
@@ -1306,6 +1326,8 @@
         });
 
         document.getElementById("download-record-btn").addEventListener("click", () => {
+            const classSeat = document.getElementById("student-class-seat").value.trim();
+            const nickname = document.getElementById("student-nickname").value.trim();
             const totalScore = player.connections + player.money;
             const hasNoNegativeTags = !player.tags.includes("好吃懶做") && !player.tags.includes("治安隱憂");
             const isWin = totalScore >= 5 && hasNoNegativeTags;
@@ -1348,9 +1370,12 @@
                 ctx.fillText("每一個選擇背後，都可能受到資源、健康與社會支持影響。", 90, 700);
                 ctx.fillStyle = "#56615d";
                 ctx.font = "24px 'Noto Sans TC', sans-serif";
-                ctx.fillText(new Date().toLocaleDateString("zh-TW"), 90, 780);
+                const studentInfo = [classSeat, nickname].filter(Boolean).join("　");
+                ctx.fillText(studentInfo ? `學生：${studentInfo}` : "學生：未填寫", 90, 780);
+                ctx.fillText(new Date().toLocaleDateString("zh-TW"), 90, 825);
                 const link = document.createElement("a");
-                link.download = `街頭求生_體驗紀錄_${new Date().toISOString().slice(0, 10)}.png`;
+                const safeName = (nickname || classSeat || "未命名").replace(/[\\/:*?"<>|]/g, "_");
+                link.download = `街頭求生_體驗紀錄_${safeName}_${new Date().toISOString().slice(0, 10)}.png`;
                 link.href = canvas.toDataURL("image/png");
                 document.body.appendChild(link);
                 link.click();
