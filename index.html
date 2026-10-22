@@ -44,17 +44,17 @@
         header {
             background: var(--primary);
             color: white;
-            padding: 20px;
+            padding: 8px 20px 10px;
             text-align: center;
         }
         
         h1 {
-            margin-bottom: 10px;
-            font-size: 1.8rem;
+            margin-bottom: 2px;
+            font-size: 1.45rem;
         }
         
         .subtitle {
-            font-size: 1rem;
+            font-size: 0.82rem;
             opacity: 0.8;
         }
         
@@ -215,8 +215,9 @@
         }
 
         .option-art {
-            height: 112px;
-            background-size: 300% 200%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            background-size: 300% auto;
             background-repeat: no-repeat;
             background-color: #f2dfd2;
         }
@@ -264,6 +265,15 @@
             padding: 6px 13px;
             cursor: pointer;
             font-weight: 700;
+        }
+
+        .options.seven-options {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-rows: repeat(2, minmax(0, 1fr));
+        }
+
+        .seven-options .option-art {
+            aspect-ratio: 16 / 8;
         }
         
         .day-indicator {
@@ -966,13 +976,9 @@
             decisionArea.appendChild(title);
 
             const options = document.createElement("div");
-            options.className = "options";
-
-            const pageSize = 6;
-            const pageCount = Math.ceil(decision.options.length / pageSize);
-            const visibleOptions = decision.options.slice(choicePage * pageSize, (choicePage + 1) * pageSize);
+            options.className = decision.options.length === 7 ? "options seven-options" : "options";
             
-            visibleOptions.forEach((option, visibleIndex) => {
+            decision.options.forEach((option, visibleIndex) => {
                 // 檢查條件
                 let disabled = false;
                 let requirementText = "";
@@ -1007,7 +1013,7 @@
                 const optionArt = document.createElement("div");
                 optionArt.className = "option-art";
                 optionArt.style.backgroundImage = `url('${choiceSheets[currentStage]}')`;
-                const sheetIndex = (choicePage * pageSize + visibleIndex) % pageSize;
+                const sheetIndex = visibleIndex % 6;
                 const col = sheetIndex % 3;
                 const row = Math.floor(sheetIndex / 3);
                 optionArt.style.backgroundPosition = `${col === 0 ? '0%' : col === 1 ? '50%' : '100%'} ${row === 0 ? '0%' : '100%'}`;
@@ -1044,27 +1050,6 @@
             });
             
             decisionArea.appendChild(options);
-
-            if (pageCount > 1) {
-                const navigation = document.createElement("div");
-                navigation.className = "choice-navigation";
-                const pageText = document.createElement("span");
-                pageText.textContent = `${choicePage + 1} / ${pageCount}`;
-                if (choicePage > 0) {
-                    const previous = document.createElement("button");
-                    previous.textContent = "← 上一組";
-                    previous.addEventListener("click", () => { choicePage--; showDecisionOptions(); });
-                    navigation.appendChild(previous);
-                }
-                if (choicePage < pageCount - 1) {
-                    const next = document.createElement("button");
-                    next.textContent = "下一組 →";
-                    next.addEventListener("click", () => { choicePage++; showDecisionOptions(); });
-                    navigation.appendChild(next);
-                }
-                navigation.appendChild(pageText);
-                decisionArea.appendChild(navigation);
-            }
         }
         
         // 處理決策結果
