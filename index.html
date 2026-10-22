@@ -269,6 +269,44 @@
         .restart-btn:hover {
             background: #324535;
         }
+
+        .stage-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(170px, 0.7fr);
+            margin: 0 0 18px;
+            overflow: hidden;
+            border: 1px solid #dfc7b6;
+            border-radius: 14px;
+            background: #fffaf5;
+            box-shadow: 0 4px 10px rgba(62, 86, 65, 0.12);
+        }
+
+        .stage-card-copy {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stage-card-label {
+            margin: 0 0 6px;
+            color: var(--secondary);
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .stage-card-copy p {
+            margin: 0;
+            color: #4d5652;
+            font-size: 0.95rem;
+        }
+
+        .stage-card img {
+            width: 100%;
+            height: 175px;
+            object-fit: cover;
+            object-position: 72% center;
+        }
         
         @media (max-width: 600px) {
             .container {
@@ -286,6 +324,15 @@
             
             .stat {
                 min-width: calc(50% - 10px);
+            }
+
+            .stage-card {
+                grid-template-columns: 1fr;
+            }
+
+            .stage-card img {
+                height: 150px;
+                grid-row: 1;
             }
         }
     </style>
@@ -762,6 +809,22 @@
             const title = document.createElement("h3");
             title.textContent = decision.title;
             decisionArea.appendChild(title);
+
+            if (currentStage === "food") {
+                const stageCard = document.createElement("div");
+                stageCard.className = "stage-card";
+
+                const stageCopy = document.createElement("div");
+                stageCopy.className = "stage-card-copy";
+                stageCopy.innerHTML = '<div class="stage-card-label">情境圖卡｜今天的第一個選擇</div><p>食物不只是填飽肚子，也和距離、時間、金錢、體力與能否得到協助有關。</p>';
+
+                const stageImage = document.createElement("img");
+                stageImage.src = "assets/illustrations/meal-station.png";
+                stageImage.alt = "社區供餐站志工遞出餐盒的情境插圖";
+
+                stageCard.append(stageCopy, stageImage);
+                decisionArea.appendChild(stageCard);
+            }
             
             const options = document.createElement("div");
             options.className = "options";
